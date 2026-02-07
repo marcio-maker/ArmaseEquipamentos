@@ -1,762 +1,684 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batman Weapons 3D</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Arsenal 3D do Batman</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            background: #000;
-            overflow: hidden;
-            font-family: 'Arial', sans-serif;
-        }
-        canvas {
-            display: block;
-        }
-        #ui {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            z-index: 100;
-        }
-        .weapon-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 2px solid #ffcc00;
-            background: rgba(20, 20, 30, 0.8);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #ffcc00;
-            transition: all 0.3s;
-        }
-        .weapon-btn:hover {
-            background: rgba(255, 204, 0, 0.2);
-            transform: scale(1.1);
-        }
-        .weapon-btn.active {
-            background: #ffcc00;
-            color: #000;
-            transform: scale(1.15);
-            box-shadow: 0 0 20px #ffcc00;
-        }
-        #controls {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+            background-color: #000;
+            color: #fff;
+            min-height: 100vh;
+            padding: 15px 10px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            z-index: 100;
+            align-items: center;
+            overflow-x: hidden;
         }
-        .control-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid #ffcc00;
-            background: rgba(20, 20, 30, 0.8);
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            color: #f0f0f0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #aaa;
+            font-size: 0.95rem;
+            line-height: 1.3;
+            padding: 0 10px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: #222;
+            border-radius: 14px;
             cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            color: #ffcc00;
-            transition: all 0.3s;
+            min-height: 150px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            touch-action: manipulation;
+            padding: 0;
         }
-        .control-btn:hover {
-            background: rgba(255, 204, 0, 0.2);
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
         }
-        .modal {
-            display: none;
+
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 15px 10px 10px;
+            color: white;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            line-height: 1.2;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .card-content {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            max-width: 95%;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Modal - Visualização 3D */
+        .card-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
             z-index: 1000;
-            animation: fadeIn 0.3s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            border: 2px solid #ffcc00;
-            border-radius: 15px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 0 40px rgba(255, 204, 0, 0.3);
-            animation: slideIn 0.4s;
-        }
-        @keyframes slideIn {
-            from { transform: translate(-50%, -60%); opacity: 0; }
-            to { transform: translate(-50%, -50%); opacity: 1; }
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .modal-icon {
-            font-size: 40px;
-            color: #ffcc00;
-        }
-        .modal-title {
-            font-size: 28px;
-            color: #ffcc00;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
-        }
-        .close-modal {
-            background: none;
-            border: none;
-            color: #ffcc00;
-            font-size: 30px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            padding: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
-        .close-modal:hover {
-            background: rgba(255, 204, 0, 0.2);
-            transform: rotate(90deg);
+
+        .card-modal.active {
+            opacity: 1;
+            visibility: visible;
         }
-        .modal-body {
-            color: #ffffff;
-            font-size: 16px;
-            line-height: 1.6;
-            text-align: center;
-            padding: 20px 0;
-            border-top: 1px solid rgba(255, 204, 0, 0.3);
-            border-bottom: 1px solid rgba(255, 204, 0, 0.3);
-            margin: 20px 0;
-        }
-        .modal-stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-        }
-        .stat {
-            text-align: center;
-        }
-        .stat-value {
-            color: #ffcc00;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .stat-label {
-            color: #888;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .modal-footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-            font-size: 14px;
-        }
-        .info-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 204, 0, 0.9);
-            border: none;
-            color: #000;
-            font-size: 24px;
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.98);
             cursor: pointer;
-            z-index: 100;
-            transition: all 0.3s;
         }
-        .info-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.7);
+
+        .modal-content {
+            position: relative;
+            z-index: 1001;
+            width: 100%;
+            height: 85vh;
+            max-width: 100%;
+            border-radius: 16px;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            background: #0a0a0a;
+        }
+
+        .card-modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            z-index: 1002;
+            touch-action: manipulation;
+        }
+
+        .close-btn:active {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-title {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 700;
+            line-height: 1.2;
+            z-index: 1002;
+            background: rgba(0,0,0,0.7);
+            padding: 8px 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .modal-description {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            z-index: 1002;
+            backdrop-filter: blur(5px);
+        }
+
+        .instruction {
+            margin-top: 30px;
+            text-align: center;
+            color: #888;
+            font-size: 0.85rem;
+            font-style: italic;
+            padding: 12px;
+            border-top: 1px solid #333;
+            width: 100%;
+            max-width: 400px;
+            line-height: 1.4;
+        }
+
+        /* Melhorias para telas muito pequenas */
+        @media (max-width: 360px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 20px;
+            }
+            
+            .cards-grid {
+                gap: 10px;
+            }
+            
+            .card {
+                min-height: 140px;
+                border-radius: 12px;
+            }
+            
+            .card-title {
+                font-size: 1rem;
+            }
+            
+            .card-content {
+                font-size: 0.75rem;
+            }
+            
+            .modal-content {
+                height: 80vh;
+            }
+            
+            .modal-title {
+                font-size: 1.3rem;
+            }
+            
+            .modal-description {
+                font-size: 0.8rem;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 280px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+                max-width: 220px;
+            }
+            
+            .card {
+                min-height: 130px;
+            }
+        }
+
+        /* Para dispositivos maiores (tablets e desktops) */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .container {
+                max-width: 700px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: repeat(4, 1fr);
+                max-width: 100%;
+                gap: 15px;
+            }
+            
+            .card {
+                min-height: 160px;
+            }
+            
+            .modal-content {
+                max-width: 800px;
+                height: 80vh;
+            }
+            
+            .instruction {
+                max-width: 700px;
+                font-size: 0.95rem;
+            }
         }
     </style>
+    <!-- Adicionando Three.js via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
 </head>
 <body>
-    <button class="info-btn" id="infoBtn">ℹ</button>
-    
-    <div id="controls">
-        <button class="control-btn" id="rotateBtn">↻</button>
-        <button class="control-btn" id="resetBtn">⟲</button>
-    </div>
-    
-    <div id="ui">
-        <button class="weapon-btn active" data-id="0">🦇</button>
-        <button class="weapon-btn" data-id="1">🪝</button>
-        <button class="weapon-btn" data-id="2">✱</button>
-        <button class="weapon-btn" data-id="3">💨</button>
-        <button class="weapon-btn" data-id="4">📡</button>
-        <button class="weapon-btn" data-id="5">❄️</button>
-        <button class="weapon-btn" data-id="6">💥</button>
-        <button class="weapon-btn" data-id="7">⚡</button>
-    </div>
-
-    <div id="weaponModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon" id="modalIcon">🦇</div>
-                <h2 class="modal-title" id="modalTitle">BATARANG</h2>
-                <button class="close-modal" id="closeModal">×</button>
-            </div>
-            <div class="modal-body" id="modalDescription">
-                A arma de arremesso icônica do Batman em forma de morcego.
-            </div>
-            <div class="modal-stats">
-                <div class="stat">
-                    <div class="stat-value" id="statDamage">80%</div>
-                    <div class="stat-label">Dano</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="statAccuracy">95%</div>
-                    <div class="stat-label">Precisão</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="statStealth">70%</div>
-                    <div class="stat-label">Furtividade</div>
+    <div class="container">
+        <h1>Arsenal 3D do Batman</h1>
+        <p class="subtitle">Toque em qualquer arma para ver em 3D</p>
+        
+        <div class="cards-grid">
+            <div class="card" data-card="1">
+                <img src="https://images.unsplash.com/photo-1580618864180-f6d7d39b8ff6?w=400&h=300&fit=crop" alt="Cinto de Utilidades" class="card-image">
+                <div class="card-overlay">
+                    <div class="card-title">Cinto de Utilidades</div>
+                    <div class="card-content">Armazenamento tático</div>
                 </div>
             </div>
-            <div class="modal-footer">
-                Arsenal do Cavaleiro das Trevas
+            
+            <div class="card" data-card="2">
+                <img src="https://images.unsplash.com/photo-1595267142568-8b6f549a0c5e?w=400&h=300&fit=crop" alt="Grappling Gun" class="card-image">
+                <div class="card-overlay">
+                    <div class="card-title">Grappling Gun</div>
+                    <div class="card-content">Escalada avançada</div>
+                </div>
             </div>
+            
+            <div class="card" data-card="3">
+                <img src="https://images.unsplash.com/photo-1595267244320-326c2d276f93?w=400&h=300&fit=crop" alt="Pistola Sticky-Bomb" class="card-image">
+                <div class="card-overlay">
+                    <div class="card-title">Sticky-Bomb Gun</div>
+                    <div class="card-content">Adesivo explosivo</div>
+                </div>
+            </div>
+            
+            <div class="card" data-card="4">
+                <img src="https://images.unsplash.com/photo-1586985289688-ca3cf47bc3d1?w=400&h=300&fit=crop" alt="Corrente com Gancho" class="card-image">
+                <div class="card-overlay">
+                    <div class="card-title">Corrente com Gancho</div>
+                    <div class="card-content">Contenção e escalada</div>
+                </div>
+            </div>
+            
+            <div class="card" data-card="5">
+                <img src="https://images.unsplash.com/photo-1597846258895-62d25747008c?w=400&h=300&fit=crop" alt="Lança-Gancho" class="card-image">
+                <div class="card-overlay">
+                    <div class="card-title">Lança-Gancho</div>
+                    <div class="card-content">Versão compacta</div>
+                </div>
+            </div>
+            
+            <div class="card" data-card="6">
+                <img src="https://images.unsplash.com/photo-1591641959606-f3c8c4c0d2be?w=400&h=300&fit=crop" alt="Batarangs" class="card-image">
+                <div class="card-overlay">
+                    <div class="card-title">Batarangs</div>
+                    <div class="card-content">Arremesso preciso</div>
+                </div>
+            </div>
+            
+            <div class="card" data-card="7">
+                <img src="https://images.unsplash.com/photo-1597848218519-70f64d8c2a48?w=400&h=300&fit=crop" alt="Dardos" class="card-image">
+                <div class="card-overlay">
+                    <div class="card-title">Dardos Ninja</div>
+                    <div class="card-content">Ataque silencioso</div>
+                </div>
+            </div>
+            
+            <div class="card" data-card="8">
+                <img src="https://images.unsplash.com/photo-1595267151188-e4d8ec5b54d5?w=400&h=300&fit=crop" alt="Bombas" class="card-image">
+                <div class="card-overlay">
+                    <div class="card-title">Bombas de Fumaça</div>
+                    <div class="card-content">Cortina e escape</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instruction">
+            <p>Toque em qualquer arma para visualização 3D interativa. Arraste para girar o modelo.</p>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
-    
+    <!-- Modal para visualização 3D -->
+    <div class="card-modal" id="cardModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content" id="modalContent">
+            <button class="close-btn" id="closeBtn">&times;</button>
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="canvas-container" id="canvasContainer"></div>
+            <div class="modal-description" id="modalDescription"></div>
+        </div>
+    </div>
+
     <script>
-        let scene, camera, renderer, controls;
-        let currentWeapon = null;
-        let autoRotate = true;
-        let weapons = [];
-        let time = 0;
-
-        const weaponData = [
-            {
-                icon: "🦇",
-                name: "BATARANG",
-                description: "A arma de arremesso icônica do Batman. Feita de uma liga metálica especial, pode ser arremessada com precisão para atordoar, desarmar ou cortar objetos à distância. Retorna ao lançador como um bumerangue.",
-                stats: { damage: 80, accuracy: 95, stealth: 70 }
+        // Conteúdo detalhado para cada arma
+        const weaponDetails = {
+            1: {
+                title: "Cinto de Utilidades do Batman",
+                description: "Equipado com múltiplos compartimentos para armas, ferramentas e dispositivos. Material: Fibra de carbono e titânio. Capacidade: 12 slots modulares.",
+                color: 0x2c3e50
             },
-            {
-                icon: "🪝",
-                name: "GRAPPLING HOOK",
-                description: "Gancho de escalada de alta tecnologia. Dispara um cabo super-resistente que permite ao Batman escalar edifícios rapidamente ou se balançar entre prédios. O motor de retração é silencioso e potente.",
-                stats: { damage: 30, accuracy: 90, stealth: 85 }
+            2: {
+                title: "Grappling Gun Avançado",
+                description: "Dispara cabos de nanofibras com ganchos de titânio. Alcance: 150 metros. Velocidade: 0-60km/h em 2 segundos.",
+                color: 0x3498db
             },
-            {
-                icon: "✱",
-                name: "BAT-CLAW",
-                description: "Garra pneumática presa ao pulso. Capaz de agarrar objetos à distância, escalar superfícies verticais ou puxar inimigos. A garra tem força suficiente para arrancar portas de veículos.",
-                stats: { damage: 65, accuracy: 85, stealth: 60 }
+            3: {
+                title: "Pistola Sticky-Bomb",
+                description: "Lança adesivos explosivos controlados remotamente. Detonação: Temporizador ou controle remoto. Raio de explosão: 5 metros.",
+                color: 0xe74c3c
             },
-            {
-                icon: "💨",
-                name: "SMOKE PELLET",
-                description: "Granada de fumaça compacta. Cria uma densa nuvem de fumaça em segundos, permitindo que Batman desapareça rapidamente ou crie distrações. A fumaça também bloqueia visão infravermelha.",
-                stats: { damage: 10, accuracy: 100, stealth: 95 }
+            4: {
+                title: "Corrente com Gancho Tático",
+                description: "Corrente de aço reforçado com gancho retrátil. Comprimento: 10 metros. Peso: 2.5kg. Uso: Escalada, contenção e ataque.",
+                color: 0x95a5a6
             },
-            {
-                icon: "📡",
-                name: "SONIC EMITTER",
-                description: "Dispositivo que emite frequências sonoras específicas. Pode desorientar inimigos, quebrar vidros à distância ou ativar/desativar equipamentos eletrônicos sensíveis.",
-                stats: { damage: 40, accuracy: 75, stealth: 50 }
+            5: {
+                title: "Lança-Gancho Compacto",
+                description: "Versão portátil do grappling gun. Alcance: 50 metros. Recarregável: Cartuchos de gás comprimido.",
+                color: 0x9b59b6
             },
-            {
-                icon: "❄️",
-                name: "FREEZE GRENADE",
-                description: "Granada criogênica que congela instantaneamente tudo em um raio de 5 metros. Usada para imobilizar inimigos, criar plataformas sobre água ou desativar máquinas.",
-                stats: { damage: 70, accuracy: 80, stealth: 40 }
+            6: {
+                title: "Batarangs Multi-Função",
+                description: "Feitos de aço inoxidável e cerâmica. Tipos: Cortantes, elétricos, rastreadores. Precisão: 99.8% a 30 metros.",
+                color: 0x1abc9c
             },
-            {
-                icon: "💥",
-                name: "EXPLOSIVE GEL",
-                description: "Gel explosivo aplicador. Pode ser aplicado em qualquer superfície e detonado remotamente. Usado para criar aberturas estratégicas em paredes ou desativar veículos.",
-                stats: { damage: 90, accuracy: 85, stealth: 55 }
+            7: {
+                title: "Dardos Ninja",
+                description: "Armas de arremesso silenciosas. Tipos: Tranquilizantes, cortantes, explosivos. Material: Cerâmica composta (indetectável).",
+                color: 0xf39c12
             },
-            {
-                icon: "⚡",
-                name: "EMP DEVICE",
-                description: "Dispositivo de Pulso Eletromagnético portátil. Desativa toda eletrônica em um raio de 50 metros, incluindo armas, veículos e sistemas de segurança, sem causar danos permanentes.",
-                stats: { damage: 50, accuracy: 95, stealth: 75 }
+            8: {
+                title: "Bombas de Fumaça Táticas",
+                description: "Criam cortina densa (20m²). Variações: Gás tranquilizante, flash cegante, marcação térmica.",
+                color: 0x7f8c8d
             }
-        ];
+        };
 
-        const weaponShapes = [
-            () => createBatarang(),
-            () => createGrapplingHook(),
-            () => createBatClaw(),
-            () => createSmokePellet(),
-            () => createSonicEmitter(),
-            () => createFreezeGrenade(),
-            () => createExplosiveGel(),
-            () => createEMPDevice()
-        ];
-
-        function init() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000000);
-
-            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 0, 12);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            document.body.appendChild(renderer.domElement);
-
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.autoRotate = autoRotate;
-            controls.autoRotateSpeed = 1.5;
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
-            scene.add(ambientLight);
-
-            const mainLight = new THREE.DirectionalLight(0xffcc00, 0.8);
-            mainLight.position.set(10, 10, 5);
-            mainLight.castShadow = true;
-            scene.add(mainLight);
-
-            const backLight = new THREE.DirectionalLight(0x0066ff, 0.4);
-            backLight.position.set(-10, -10, -5);
-            scene.add(backLight);
-
-            const floorGeometry = new THREE.PlaneGeometry(50, 50);
-            const floorMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0x111122,
-                shininess: 100
-            });
-            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-            floor.rotation.x = -Math.PI / 2;
-            floor.position.y = -4;
-            floor.receiveShadow = true;
-            scene.add(floor);
-
-            const grid = new THREE.GridHelper(50, 50, 0x222233, 0x111122);
-            grid.position.y = -3.99;
-            scene.add(grid);
-
-            createAllWeapons();
-            showWeapon(0);
-
-            setupEventListeners();
-            animate();
-
-            window.addEventListener('resize', onWindowResize);
-        }
-
-        function createAllWeapons() {
-            weaponShapes.forEach((createFunc, index) => {
-                const weapon = createFunc();
-                weapon.visible = false;
-                scene.add(weapon);
-                weapons.push(weapon);
-            });
-        }
-
-        function createBatarang() {
-            const group = new THREE.Group();
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            const modal = document.getElementById('cardModal');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalContent = document.getElementById('modalContent');
+            const closeBtn = document.getElementById('closeBtn');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+            const canvasContainer = document.getElementById('canvasContainer');
             
-            const wingShape = new THREE.Shape();
-            wingShape.moveTo(0, 0);
-            wingShape.bezierCurveTo(2, 1, 3, 0, 4, -1);
-            wingShape.bezierCurveTo(3, -2, 2, -3, 0, -2);
-            wingShape.bezierCurveTo(-2, -3, -3, -2, -4, -1);
-            wingShape.bezierCurveTo(-3, 0, -2, 1, 0, 0);
+            // Variáveis Three.js
+            let scene, camera, renderer, controls, currentWeapon = null;
             
-            const extrudeSettings = {
-                steps: 1,
-                depth: 0.3,
-                bevelEnabled: true,
-                bevelThickness: 0.1,
-                bevelSize: 0.1
-            };
-            
-            const geometry = new THREE.ExtrudeGeometry(wingShape, extrudeSettings);
-            const material = new THREE.MeshPhongMaterial({
-                color: 0x333333,
-                emissive: 0x222222,
-                shininess: 100
-            });
-            
-            const batarang = new THREE.Mesh(geometry, material);
-            batarang.rotation.x = Math.PI / 2;
-            batarang.scale.set(0.3, 0.3, 0.3);
-            group.add(batarang);
-            
-            return group;
-        }
-
-        function createGrapplingHook() {
-            const group = new THREE.Group();
-            
-            const baseGeometry = new THREE.CylinderGeometry(0.2, 0.2, 2, 8);
-            const baseMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 });
-            const base = new THREE.Mesh(baseGeometry, baseMaterial);
-            base.rotation.z = Math.PI / 2;
-            group.add(base);
-            
-            const hookGeometry = new THREE.TorusGeometry(0.4, 0.08, 8, 16, Math.PI);
-            const hookMaterial = new THREE.MeshPhongMaterial({ color: 0x666666 });
-            const hook = new THREE.Mesh(hookGeometry, hookMaterial);
-            hook.position.x = 1.2;
-            hook.rotation.z = Math.PI / 2;
-            group.add(hook);
-            
-            const tipGeometry = new THREE.SphereGeometry(0.1, 8, 8);
-            const tipMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-            const tip = new THREE.Mesh(tipGeometry, tipMaterial);
-            tip.position.x = 1.6;
-            group.add(tip);
-            
-            group.scale.set(1.2, 1.2, 1.2);
-            return group;
-        }
-
-        function createBatClaw() {
-            const group = new THREE.Group();
-            
-            const baseGeometry = new THREE.BoxGeometry(1, 1, 0.4);
-            const baseMaterial = new THREE.MeshPhongMaterial({ color: 0x222222 });
-            const base = new THREE.Mesh(baseGeometry, baseMaterial);
-            group.add(base);
-            
-            for (let i = 0; i < 3; i++) {
-                const angle = (i * Math.PI * 2) / 3;
-                const radius = 0.4;
+            function initThreeJS(weaponId) {
+                // Limpa o container
+                canvasContainer.innerHTML = '';
                 
-                const clawGroup = new THREE.Group();
+                // Cria cena
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x0a0a0a);
                 
-                const armGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 6);
-                const armMaterial = new THREE.MeshPhongMaterial({ color: 0x555555 });
-                const arm = new THREE.Mesh(armGeometry, armMaterial);
-                arm.rotation.z = -Math.PI / 6;
-                clawGroup.add(arm);
+                // Cria câmera
+                const width = canvasContainer.clientWidth;
+                const height = canvasContainer.clientHeight;
+                camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+                camera.position.set(0, 2, 5);
                 
-                const clawGeometry = new THREE.ConeGeometry(0.08, 0.3, 6);
-                const clawMaterial = new THREE.MeshPhongMaterial({ color: 0x888888 });
-                const claw = new THREE.Mesh(clawGeometry, clawMaterial);
-                claw.position.y = 0.75;
-                claw.rotation.z = Math.PI / 2;
-                clawGroup.add(claw);
+                // Cria renderer
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(width, height);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                canvasContainer.appendChild(renderer.domElement);
                 
-                clawGroup.position.x = Math.cos(angle) * radius;
-                clawGroup.position.z = Math.sin(angle) * radius;
-                clawGroup.rotation.y = angle;
+                // Controles
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.05;
+                controls.minDistance = 1;
+                controls.maxDistance = 10;
+                controls.enableZoom = true;
+                controls.enablePan = true;
                 
-                group.add(clawGroup);
+                // Luzes
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(5, 10, 7);
+                scene.add(directionalLight);
+                
+                // Adiciona uma arma 3D
+                addWeaponModel(weaponId);
+                
+                // Adiciona uma base
+                const baseGeometry = new THREE.CylinderGeometry(1, 1, 0.1, 32);
+                const baseMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x333333,
+                    metalness: 0.3,
+                    roughness: 0.8
+                });
+                const base = new THREE.Mesh(baseGeometry, baseMaterial);
+                base.position.y = -0.5;
+                scene.add(base);
+                
+                // Animação
+                function animate() {
+                    requestAnimationFrame(animate);
+                    controls.update();
+                    renderer.render(scene, camera);
+                }
+                animate();
             }
             
-            group.scale.set(1.5, 1.5, 1.5);
-            return group;
-        }
-
-        function createSmokePellet() {
-            const group = new THREE.Group();
-            
-            const sphereGeometry = new THREE.SphereGeometry(0.8, 16, 16);
-            const sphereMaterial = new THREE.MeshPhongMaterial({
-                color: 0x666666,
-                transparent: true,
-                opacity: 0.8
-            });
-            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-            group.add(sphere);
-            
-            const linesGroup = new THREE.Group();
-            for (let i = 0; i < 8; i++) {
-                const lineGeometry = new THREE.CylinderGeometry(0.02, 0.1, 0.5, 4);
-                const lineMaterial = new THREE.MeshPhongMaterial({ color: 0x888888 });
-                const line = new THREE.Mesh(lineGeometry, lineMaterial);
+            function addWeaponModel(weaponId) {
+                const detail = weaponDetails[weaponId];
+                const color = detail.color;
                 
-                const angle = (i * Math.PI * 2) / 8;
-                line.position.x = Math.cos(angle) * 0.6;
-                line.position.z = Math.sin(angle) * 0.6;
-                line.position.y = 0;
-                line.rotation.x = Math.PI / 2;
-                line.rotation.z = angle;
+                // Cria material
+                const material = new THREE.MeshStandardMaterial({ 
+                    color: color,
+                    metalness: 0.8,
+                    roughness: 0.2
+                });
                 
-                linesGroup.add(line);
+                let geometry;
+                let mesh;
+                
+                // Cria geometria baseada no tipo de arma
+                switch(weaponId) {
+                    case '1': // Cinto
+                        geometry = new THREE.BoxGeometry(2, 0.3, 0.5);
+                        mesh = new THREE.Mesh(geometry, material);
+                        break;
+                    case '2': // Grappling Gun
+                        geometry = new THREE.CylinderGeometry(0.1, 0.1, 0.8, 8);
+                        mesh = new THREE.Mesh(geometry, material);
+                        break;
+                    case '3': // Sticky-Bomb Gun
+                        geometry = new THREE.BoxGeometry(0.3, 0.1, 0.6);
+                        mesh = new THREE.Mesh(geometry, material);
+                        break;
+                    case '4': // Corrente
+                        geometry = new THREE.TorusGeometry(0.5, 0.05, 8, 20);
+                        mesh = new THREE.Mesh(geometry, material);
+                        break;
+                    case '5': // Lança-Gancho
+                        geometry = new THREE.ConeGeometry(0.1, 0.6, 8);
+                        mesh = new THREE.Mesh(geometry, material);
+                        break;
+                    case '6': // Batarangs
+                        geometry = new THREE.OctahedronGeometry(0.3);
+                        mesh = new THREE.Mesh(geometry, material);
+                        break;
+                    case '7': // Dardos
+                        geometry = new THREE.ConeGeometry(0.05, 0.3, 8);
+                        mesh = new THREE.Mesh(geometry, material);
+                        break;
+                    case '8': // Bombas
+                        geometry = new THREE.SphereGeometry(0.2, 16, 16);
+                        mesh = new THREE.Mesh(geometry, material);
+                        break;
+                    default:
+                        geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+                        mesh = new THREE.Mesh(geometry, material);
+                }
+                
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                scene.add(mesh);
             }
-            linesGroup.position.y = 0.8;
-            group.add(linesGroup);
             
-            return group;
-        }
-
-        function createSonicEmitter() {
-            const group = new THREE.Group();
-            
-            const baseGeometry = new THREE.CylinderGeometry(0.6, 0.8, 0.5, 16);
-            const baseMaterial = new THREE.MeshPhongMaterial({ color: 0x222233 });
-            const base = new THREE.Mesh(baseGeometry, baseMaterial);
-            group.add(base);
-            
-            const dishGeometry = new THREE.SphereGeometry(0.7, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-            const dishMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0x333344,
-                wireframe: true
-            });
-            const dish = new THREE.Mesh(dishGeometry, dishMaterial);
-            dish.position.y = 0.5;
-            dish.rotation.x = Math.PI;
-            group.add(dish);
-            
-            const emitterGeometry = new THREE.CylinderGeometry(0.1, 0.3, 0.8, 8);
-            const emitterMaterial = new THREE.MeshPhongMaterial({ color: 0xffcc00 });
-            const emitter = new THREE.Mesh(emitterGeometry, emitterMaterial);
-            emitter.position.y = 0.9;
-            group.add(emitter);
-            
-            return group;
-        }
-
-        function createFreezeGrenade() {
-            const group = new THREE.Group();
-            
-            const coreGeometry = new THREE.IcosahedronGeometry(0.7, 0);
-            const coreMaterial = new THREE.MeshPhongMaterial({
-                color: 0x00aaff,
-                emissive: 0x003366,
-                shininess: 100
-            });
-            const core = new THREE.Mesh(coreGeometry, coreMaterial);
-            group.add(core);
-            
-            const ringsGroup = new THREE.Group();
-            for (let i = 0; i < 3; i++) {
-                const ringGeometry = new THREE.TorusGeometry(0.9 + i * 0.2, 0.05, 8, 24);
-                const ringMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff });
-                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-                ring.rotation.x = Math.PI / 2;
-                ringsGroup.add(ring);
-            }
-            group.add(ringsGroup);
-            
-            const spikesGroup = new THREE.Group();
-            for (let i = 0; i < 12; i++) {
-                const spikeGeometry = new THREE.ConeGeometry(0.05, 0.4, 4);
-                const spikeMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff });
-                const spike = new THREE.Mesh(spikeGeometry, spikeMaterial);
-                
-                const phi = Math.acos(-1 + (2 * i) / 12);
-                const theta = Math.sqrt(12 * Math.PI) * phi;
-                
-                spike.position.x = 0.9 * Math.cos(theta) * Math.sin(phi);
-                spike.position.y = 0.9 * Math.sin(theta) * Math.sin(phi);
-                spike.position.z = 0.9 * Math.cos(phi);
-                
-                spike.lookAt(new THREE.Vector3(0, 0, 0));
-                spike.rotateX(Math.PI / 2);
-                
-                spikesGroup.add(spike);
-            }
-            group.add(spikesGroup);
-            
-            return group;
-        }
-
-        function createExplosiveGel() {
-            const group = new THREE.Group();
-            
-            const containerGeometry = new THREE.CylinderGeometry(0.8, 0.8, 1.2, 16);
-            const containerMaterial = new THREE.MeshPhongMaterial({
-                color: 0x884400,
-                transparent: true,
-                opacity: 0.7
-            });
-            const container = new THREE.Mesh(containerGeometry, containerMaterial);
-            group.add(container);
-            
-            const gelGeometry = new THREE.SphereGeometry(0.6, 16, 16);
-            const gelMaterial = new THREE.MeshPhongMaterial({
-                color: 0xff6600,
-                emissive: 0x442200
-            });
-            const gel = new THREE.Mesh(gelGeometry, gelMaterial);
-            gel.position.y = 0.1;
-            group.add(gel);
-            
-            const detonatorGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-            const detonatorMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-            const detonator = new THREE.Mesh(detonatorGeometry, detonatorMaterial);
-            detonator.position.y = 0.9;
-            group.add(detonator);
-            
-            return group;
-        }
-
-        function createEMPDevice() {
-            const group = new THREE.Group();
-            
-            const bodyGeometry = new THREE.BoxGeometry(1.5, 0.8, 1);
-            const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x111122 });
-            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            group.add(body);
-            
-            const panelGeometry = new THREE.BoxGeometry(1.2, 0.1, 0.8);
-            const panelMaterial = new THREE.MeshPhongMaterial({ color: 0x222244 });
-            const panel = new THREE.Mesh(panelGeometry, panelMaterial);
-            panel.position.y = 0.45;
-            group.add(panel);
-            
-            const lightsGroup = new THREE.Group();
-            for (let i = 0; i < 5; i++) {
-                for (let j = 0; j < 3; j++) {
-                    const lightGeometry = new THREE.BoxGeometry(0.15, 0.05, 0.15);
-                    const lightMaterial = new THREE.MeshPhongMaterial({ 
-                        color: i % 2 === 0 ? 0x00ff00 : 0xff0000
-                    });
-                    const light = new THREE.Mesh(lightGeometry, lightMaterial);
-                    light.position.x = (i - 2) * 0.25;
-                    light.position.z = (j - 1) * 0.25;
-                    light.position.y = 0.5;
-                    lightsGroup.add(light);
+            function onWindowResize() {
+                if (camera && renderer) {
+                    camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
                 }
             }
-            group.add(lightsGroup);
             
-            const antennaGeometry = new THREE.CylinderGeometry(0.03, 0.03, 0.8, 6);
-            const antennaMaterial = new THREE.MeshPhongMaterial({ color: 0x444466 });
-            const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
-            antenna.position.y = 0.9;
-            antenna.rotation.x = Math.PI / 4;
-            group.add(antenna);
-            
-            return group;
-        }
-
-        function showWeapon(index) {
-            if (currentWeapon !== null) {
-                weapons[currentWeapon].visible = false;
-            }
-            
-            weapons[index].visible = true;
-            currentWeapon = index;
-            
-            document.querySelectorAll('.weapon-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-id="${index}"]`).classList.add('active');
-            
-            camera.position.set(0, 0, 12);
-            controls.reset();
-        }
-
-        function showWeaponModal(index) {
-            const data = weaponData[index];
-            
-            document.getElementById('modalIcon').textContent = data.icon;
-            document.getElementById('modalTitle').textContent = data.name;
-            document.getElementById('modalDescription').textContent = data.description;
-            document.getElementById('statDamage').textContent = data.stats.damage + '%';
-            document.getElementById('statAccuracy').textContent = data.stats.accuracy + '%';
-            document.getElementById('statStealth').textContent = data.stats.stealth + '%';
-            
-            document.getElementById('weaponModal').style.display = 'block';
-            
-            showWeapon(index);
-        }
-
-        function setupEventListeners() {
-            document.querySelectorAll('.weapon-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = parseInt(btn.dataset.id);
-                    showWeaponModal(id);
+            // Event listeners para os cards
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const weaponId = this.getAttribute('data-card');
+                    const detail = weaponDetails[weaponId];
+                    
+                    modalTitle.textContent = detail.title;
+                    modalDescription.textContent = detail.description;
+                    
+                    // Inicializa Three.js
+                    setTimeout(() => {
+                        initThreeJS(weaponId);
+                        window.addEventListener('resize', onWindowResize);
+                    }, 100);
+                    
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
                 });
             });
-
-            document.getElementById('infoBtn').addEventListener('click', () => {
-                if (currentWeapon !== null) {
-                    showWeaponModal(currentWeapon);
-                }
-            });
-
-            document.getElementById('rotateBtn').addEventListener('click', function() {
-                autoRotate = !autoRotate;
-                controls.autoRotate = autoRotate;
-                this.style.background = autoRotate ? '#ffcc00' : 'rgba(20, 20, 30, 0.8)';
-                this.style.color = autoRotate ? '#000' : '#ffcc00';
-            });
-
-            document.getElementById('resetBtn').addEventListener('click', () => {
-                camera.position.set(0, 0, 12);
-                controls.reset();
-            });
-
-            document.getElementById('closeModal').addEventListener('click', () => {
-                document.getElementById('weaponModal').style.display = 'none';
-            });
-
-            document.getElementById('weaponModal').addEventListener('click', (e) => {
-                if (e.target === document.getElementById('weaponModal')) {
-                    document.getElementById('weaponModal').style.display = 'none';
-                }
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.getElementById('weaponModal').style.display = 'none';
-                }
-            });
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
             
-            time += 0.016;
-            
-            if (currentWeapon !== null && weapons[currentWeapon]) {
-                const weapon = weapons[currentWeapon];
-                
-                weapon.rotation.y += 0.01;
-                
-                const float = Math.sin(time * 2) * 0.1;
-                weapon.position.y = float;
-                
-                const pulse = Math.sin(time * 3) * 0.05 + 0.95;
-                weapon.scale.set(pulse, pulse, pulse);
+            // Fecha o modal
+            function closeModal() {
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    document.body.style.overflow = 'auto';
+                    window.removeEventListener('resize', onWindowResize);
+                    // Limpa a cena Three.js
+                    if (renderer) {
+                        renderer.dispose();
+                    }
+                }, 300);
             }
             
-            controls.update();
-            renderer.render(scene, camera);
-        }
-
-        init();
+            modalOverlay.addEventListener('click', closeModal);
+            closeBtn.addEventListener('click', closeModal);
+            
+            // Fecha com ESC
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeModal();
+                }
+            });
+            
+            // Previne zoom com dois toques
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Anima os cards
+            setTimeout(() => {
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 80);
+                });
+            }, 300);
+            
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(15px)';
+                card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            });
+        });
     </script>
 </body>
 </html>
