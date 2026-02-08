@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -58,11 +59,13 @@
         }
 
         .card {
-            background-color: #222;
+            background: #ffffff;
+            /* Fundo branco puro */
             border-radius: 14px;
             cursor: pointer;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            /* Sombra mais suave */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -70,16 +73,33 @@
             min-height: 150px;
             position: relative;
             overflow: hidden;
-            border: 2px solid transparent;
+            border: 1px solid #e0e0e0;
+            /* Borda leve para definir o card */
             touch-action: manipulation;
             padding: 0;
         }
 
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #444, transparent);
+        }
+
         .card-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 12px;
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+            /* Cria uma máscara baseada na luminosidade da imagem */
+            -webkit-mask-image: linear-gradient(#000, #000);
+            mask-image: linear-gradient(#000, #000);
+            filter: brightness(1.2);
+            background-color: transparent;
         }
 
         .card-overlay {
@@ -87,7 +107,8 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            /* Gradiente do cinza escuro para o transparente */
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 20%, transparent 100%);
             padding: 15px 10px 10px;
             color: white;
         }
@@ -95,20 +116,19 @@
         .card-title {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #fff;
+            color: #ffffff;
+            /* Mantido branco para contrastar com o overlay escuro */
             text-align: center;
             line-height: 1.2;
             margin-bottom: 5px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
 
         .card-content {
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.8);
+            /* Cinza claro para o subtítulo */
             text-align: center;
             font-size: 0.8rem;
             line-height: 1.3;
-            max-width: 95%;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
         .card:active {
@@ -118,6 +138,11 @@
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border-color: #555;
+        }
+
+        .card:hover .card-image {
+            transform: scale(1.05);
         }
 
         /* Modal - Visualização 3D */
@@ -203,7 +228,7 @@
             font-weight: 700;
             line-height: 1.2;
             z-index: 1002;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             padding: 8px 15px;
             border-radius: 8px;
             backdrop-filter: blur(5px);
@@ -213,6 +238,8 @@
             width: 100%;
             height: 100%;
             display: block;
+            position: relative;
+            z-index: 1;
         }
 
         .modal-description {
@@ -220,7 +247,7 @@
             bottom: 15px;
             left: 15px;
             right: 15px;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             color: #fff;
             padding: 15px;
             border-radius: 10px;
@@ -243,42 +270,59 @@
             line-height: 1.4;
         }
 
+        .watermark-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         /* Melhorias para telas muito pequenas */
         @media (max-width: 360px) {
             h1 {
                 font-size: 1.6rem;
             }
-            
+
             .subtitle {
                 font-size: 0.85rem;
                 margin-bottom: 20px;
             }
-            
+
             .cards-grid {
                 gap: 10px;
             }
-            
+
             .card {
                 min-height: 140px;
                 border-radius: 12px;
             }
-            
+
+            .card-image {
+                width: 65%;
+                height: 65%;
+            }
+
             .card-title {
                 font-size: 1rem;
             }
-            
+
             .card-content {
                 font-size: 0.75rem;
             }
-            
+
             .modal-content {
                 height: 80vh;
             }
-            
+
             .modal-title {
                 font-size: 1.3rem;
             }
-            
+
             .modal-description {
                 font-size: 0.8rem;
                 padding: 12px;
@@ -290,7 +334,7 @@
                 grid-template-columns: 1fr;
                 max-width: 220px;
             }
-            
+
             .card {
                 min-height: 130px;
             }
@@ -301,34 +345,39 @@
             body {
                 padding: 20px;
             }
-            
+
             .container {
                 max-width: 700px;
             }
-            
+
             h1 {
                 font-size: 2.2rem;
             }
-            
+
             .subtitle {
                 font-size: 1.1rem;
             }
-            
+
             .cards-grid {
                 grid-template-columns: repeat(4, 1fr);
                 max-width: 100%;
                 gap: 15px;
             }
-            
+
             .card {
                 min-height: 160px;
             }
-            
+
+            .card-image {
+                width: 75%;
+                height: 75%;
+            }
+
             .modal-content {
                 max-width: 800px;
                 height: 80vh;
             }
-            
+
             .instruction {
                 max-width: 700px;
                 font-size: 0.95rem;
@@ -339,82 +388,90 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
 </head>
+
 <body>
     <div class="container">
         <h1>Arsenal 3D do Batman</h1>
         <p class="subtitle">Toque em qualquer arma para ver em 3D</p>
-        
+
         <div class="cards-grid">
             <div class="card" data-card="1">
-                <img src="https://images.unsplash.com/photo-1580618864180-f6d7d39b8ff6?w=400&h=300&fit=crop" alt="Cinto de Utilidades" class="card-image">
+                <img src="https://www.sunnybrinquedos.com.br/upload/produto/imagem/s_cinto-de-utilidades-do-batman-com-acessorios-batman-1.webp"
+                    alt="Cinto de Utilidades" class="card-image">
                 <div class="card-overlay">
                     <div class="card-title">Cinto de Utilidades</div>
-                    <div class="card-content">Armazenamento tático</div>
+                    <div class="card-content">Sistema tático modular</div>
                 </div>
             </div>
-            
+
             <div class="card" data-card="2">
-                <img src="https://images.unsplash.com/photo-1595267142568-8b6f549a0c5e?w=400&h=300&fit=crop" alt="Grappling Gun" class="card-image">
+                <img src="https://mintconditioncustom.com/wp-content/uploads/2013/07/NECA_Batman_Arkham_Origins_Grapnel_Prop_Replica_02-e1374176451767.jpg"
+                    alt="Grappling Gun" class="card-image">
                 <div class="card-overlay">
                     <div class="card-title">Grappling Gun</div>
-                    <div class="card-content">Escalada avançada</div>
+                    <div class="card-content">Mobilidade vertical</div>
                 </div>
             </div>
-            
+
             <div class="card" data-card="3">
-                <img src="https://images.unsplash.com/photo-1595267244320-326c2d276f93?w=400&h=300&fit=crop" alt="Pistola Sticky-Bomb" class="card-image">
+                <img src="https://media.printables.com/media/prints/340961/images/2909886_f3abbd17-7fbd-4101-ac33-684af01fd13a/thumbs/inside/1280x960/jpg/screenshot-2022-12-15-174644.webp"
+                    alt="Sticky-Bomb Gun" class="card-image">
                 <div class="card-overlay">
                     <div class="card-title">Sticky-Bomb Gun</div>
-                    <div class="card-content">Adesivo explosivo</div>
+                    <div class="card-content">Demolição controlada</div>
                 </div>
             </div>
-            
+
             <div class="card" data-card="4">
-                <img src="https://images.unsplash.com/photo-1586985289688-ca3cf47bc3d1?w=400&h=300&fit=crop" alt="Corrente com Gancho" class="card-image">
+                <img src="https://static3.tcdn.com.br/img/img_prod/388802/corrente_com_gancho_prata_decoracao_22677_1_ab00a3ad6fe886d22eb831be0960b877.jpg"
+                    alt="Corrente com Gancho" class="card-image">
                 <div class="card-overlay">
                     <div class="card-title">Corrente com Gancho</div>
                     <div class="card-content">Contenção e escalada</div>
                 </div>
             </div>
-            
+
             <div class="card" data-card="5">
-                <img src="https://images.unsplash.com/photo-1597846258895-62d25747008c?w=400&h=300&fit=crop" alt="Lança-Gancho" class="card-image">
+                <img src="https://p7.hiclipart.com/preview/198/678/500/firearm-batman-arkham-origins-grappling-hook-grapple-hook.jpg"
+                    alt="Lança-Gancho" class="card-image">
                 <div class="card-overlay">
                     <div class="card-title">Lança-Gancho</div>
-                    <div class="card-content">Versão compacta</div>
+                    <div class="card-content">Acesso portátil</div>
                 </div>
             </div>
-            
+
             <div class="card" data-card="6">
-                <img src="https://images.unsplash.com/photo-1591641959606-f3c8c4c0d2be?w=400&h=300&fit=crop" alt="Batarangs" class="card-image">
+                <img src="https://www.nicepng.com/png/detail/229-2290350_batarang-batman-batarang-png.png"
+                    alt="Batarangs" class="card-image">
                 <div class="card-overlay">
                     <div class="card-title">Batarangs</div>
-                    <div class="card-content">Arremesso preciso</div>
+                    <div class="card-content">Precisão cirúrgica</div>
                 </div>
             </div>
-            
+
             <div class="card" data-card="7">
-                <img src="https://images.unsplash.com/photo-1597848218519-70f64d8c2a48?w=400&h=300&fit=crop" alt="Dardos" class="card-image">
+                <img src="https://p1.hiclipart.com/preview/952/233/175/kunai-loves-shuriken-black-dagger-png-clipart.jpg"
+                    alt="Dardos Táticos" class="card-image">
                 <div class="card-overlay">
-                    <div class="card-title">Dardos Ninja</div>
-                    <div class="card-content">Ataque silencioso</div>
+                    <div class="card-title">Dardos Táticos</div>
+                    <div class="card-content">Neutralização silenciosa</div>
                 </div>
             </div>
-            
+
             <div class="card" data-card="8">
-                <img src="https://images.unsplash.com/photo-1595267151188-e4d8ec5b54d5?w=400&h=300&fit=crop" alt="Bombas" class="card-image">
+                <img src="https://fbi.cults3d.com/uploaders/21576466/illustration-file/64daa169-5d01-47f6-b4a2-451e2b3c2937/Captura-de-pantalla-2022-03-25-222648.png"
+                    alt="Bombas de Fumaça" class="card-image">
                 <div class="card-overlay">
                     <div class="card-title">Bombas de Fumaça</div>
                     <div class="card-content">Cortina e escape</div>
                 </div>
             </div>
         </div>
-        
+
         <div class="instruction">
             <p>Toque em qualquer arma para visualização 3D interativa. Arraste para girar o modelo.</p>
         </div>
     </div>
-
     <!-- Modal para visualização 3D -->
     <div class="card-modal" id="cardModal">
         <div class="modal-overlay" id="modalOverlay"></div>
@@ -425,7 +482,6 @@
             <div class="modal-description" id="modalDescription"></div>
         </div>
     </div>
-
     <script>
         // Conteúdo detalhado para cada arma
         const weaponDetails = {
@@ -460,7 +516,7 @@
                 color: 0x1abc9c
             },
             7: {
-                title: "Dardos Ninja",
+                title: "Dardos Táticos",
                 description: "Armas de arremesso silenciosas. Tipos: Tranquilizantes, cortantes, explosivos. Material: Cerâmica composta (indetectável).",
                 color: 0xf39c12
             },
@@ -470,8 +526,7 @@
                 color: 0x7f8c8d
             }
         };
-
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const cards = document.querySelectorAll('.card');
             const modal = document.getElementById('cardModal');
             const modalOverlay = document.getElementById('modalOverlay');
@@ -480,30 +535,30 @@
             const modalTitle = document.getElementById('modalTitle');
             const modalDescription = document.getElementById('modalDescription');
             const canvasContainer = document.getElementById('canvasContainer');
-            
+
             // Variáveis Three.js
             let scene, camera, renderer, controls, currentWeapon = null;
-            
+
             function initThreeJS(weaponId) {
                 // Limpa o container
                 canvasContainer.innerHTML = '';
-                
+
                 // Cria cena
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x0a0a0a);
-                
+
                 // Cria câmera
                 const width = canvasContainer.clientWidth;
                 const height = canvasContainer.clientHeight;
                 camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
                 camera.position.set(0, 2, 5);
-                
+
                 // Cria renderer
                 renderer = new THREE.WebGLRenderer({ antialias: true });
                 renderer.setSize(width, height);
                 renderer.setPixelRatio(window.devicePixelRatio);
                 canvasContainer.appendChild(renderer.domElement);
-                
+
                 // Controles
                 controls = new THREE.OrbitControls(camera, renderer.domElement);
                 controls.enableDamping = true;
@@ -512,21 +567,21 @@
                 controls.maxDistance = 10;
                 controls.enableZoom = true;
                 controls.enablePan = true;
-                
+
                 // Luzes
                 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
                 scene.add(ambientLight);
-                
+
                 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
                 directionalLight.position.set(5, 10, 7);
                 scene.add(directionalLight);
-                
+
                 // Adiciona uma arma 3D
                 addWeaponModel(weaponId);
-                
+
                 // Adiciona uma base
                 const baseGeometry = new THREE.CylinderGeometry(1, 1, 0.1, 32);
-                const baseMaterial = new THREE.MeshStandardMaterial({ 
+                const baseMaterial = new THREE.MeshStandardMaterial({
                     color: 0x333333,
                     metalness: 0.3,
                     roughness: 0.8
@@ -534,7 +589,7 @@
                 const base = new THREE.Mesh(baseGeometry, baseMaterial);
                 base.position.y = -0.5;
                 scene.add(base);
-                
+
                 // Animação
                 function animate() {
                     requestAnimationFrame(animate);
@@ -543,23 +598,23 @@
                 }
                 animate();
             }
-            
+
             function addWeaponModel(weaponId) {
                 const detail = weaponDetails[weaponId];
                 const color = detail.color;
-                
+
                 // Cria material
-                const material = new THREE.MeshStandardMaterial({ 
+                const material = new THREE.MeshStandardMaterial({
                     color: color,
                     metalness: 0.8,
                     roughness: 0.2
                 });
-                
+
                 let geometry;
                 let mesh;
-                
+
                 // Cria geometria baseada no tipo de arma
-                switch(weaponId) {
+                switch (weaponId) {
                     case '1': // Cinto
                         geometry = new THREE.BoxGeometry(2, 0.3, 0.5);
                         mesh = new THREE.Mesh(geometry, material);
@@ -596,12 +651,12 @@
                         geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
                         mesh = new THREE.Mesh(geometry, material);
                 }
-                
+
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
                 scene.add(mesh);
             }
-            
+
             function onWindowResize() {
                 if (camera && renderer) {
                     camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
@@ -609,27 +664,39 @@
                     renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
                 }
             }
-            
+
             // Event listeners para os cards
             cards.forEach(card => {
-                card.addEventListener('click', function() {
+                card.addEventListener('click', function () {
                     const weaponId = this.getAttribute('data-card');
                     const detail = weaponDetails[weaponId];
-                    
+                    const src = this.querySelector('.card-image').src;
+
                     modalTitle.textContent = detail.title;
                     modalDescription.textContent = detail.description;
-                    
+
+                    // Remove existing watermark
+                    const existingWatermark = modalContent.querySelector('.watermark-img');
+                    if (existingWatermark) existingWatermark.remove();
+
+                    // Add watermark
+                    const watermark = document.createElement('img');
+                    watermark.src = src;
+                    watermark.classList.add('watermark-img');
+                    watermark.alt = 'Marca d\'água';
+                    modalContent.appendChild(watermark);
+
                     // Inicializa Three.js
                     setTimeout(() => {
                         initThreeJS(weaponId);
                         window.addEventListener('resize', onWindowResize);
                     }, 100);
-                    
+
                     modal.classList.add('active');
                     document.body.style.overflow = 'hidden';
                 });
             });
-            
+
             // Fecha o modal
             function closeModal() {
                 modal.classList.remove('active');
@@ -642,27 +709,27 @@
                     }
                 }, 300);
             }
-            
+
             modalOverlay.addEventListener('click', closeModal);
             closeBtn.addEventListener('click', closeModal);
-            
+
             // Fecha com ESC
-            document.addEventListener('keydown', function(event) {
+            document.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape') {
                     closeModal();
                 }
             });
-            
+
             // Previne zoom com dois toques
             let lastTouchEnd = 0;
-            document.addEventListener('touchend', function(event) {
+            document.addEventListener('touchend', function (event) {
                 const now = (new Date()).getTime();
                 if (now - lastTouchEnd <= 300) {
                     event.preventDefault();
                 }
                 lastTouchEnd = now;
             }, false);
-            
+
             // Anima os cards
             setTimeout(() => {
                 cards.forEach((card, index) => {
@@ -672,7 +739,7 @@
                     }, index * 80);
                 });
             }, 300);
-            
+
             cards.forEach(card => {
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(15px)';
@@ -681,4 +748,5 @@
         });
     </script>
 </body>
+
 </html>
